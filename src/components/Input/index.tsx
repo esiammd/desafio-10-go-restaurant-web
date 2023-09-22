@@ -1,12 +1,12 @@
 import React, {
-  InputHTMLAttributes,
+  type InputHTMLAttributes,
   useEffect,
   useRef,
   useState,
   useCallback,
 } from 'react';
 
-import { IconBaseProps } from 'react-icons';
+import { type IconBaseProps } from 'react-icons';
 import { useField } from '@unform/core';
 
 import { Container } from './styles';
@@ -43,7 +43,7 @@ const Input: React.FC<IInputProps> = ({ name, icon: Icon, ...rest }) => {
   }, [fieldName, registerField]);
 
   return (
-    <Container isFilled={isFilled} isFocused={isFocused}>
+    <Container $isFilled={isFilled} $isFocused={isFocused}>
       {Icon && <Icon size={20} />}
 
       <input

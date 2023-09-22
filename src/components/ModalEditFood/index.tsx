@@ -1,10 +1,12 @@
 import React, { useRef, useCallback } from 'react';
-
 import { FiCheckSquare } from 'react-icons/fi';
-import { FormHandles } from '@unform/core';
-import { Form } from './styles';
+import { type FormHandles } from '@unform/core';
+import * as Yup from 'yup';
+
 import Modal from '../Modal';
 import Input from '../Input';
+
+import { Form } from './styles';
 
 interface IFoodPlate {
   id: number;
@@ -39,7 +41,24 @@ const ModalEditFood: React.FC<IModalProps> = ({
 
   const handleSubmit = useCallback(
     async (data: IEditFoodData) => {
-      // EDIT A FOOD PLATE AND CLOSE THE MODAL
+      try {
+        const schema = Yup.object().shape({
+          name: Yup.string().required('Nome obrigatório'),
+          image: Yup.string().required('Imagem obrigatória'),
+          price: Yup.number().required('Preço obrigatório'),
+          description: Yup.string().required('Descrição obrigatório'),
+        });
+
+        await schema.validate(data, {
+          abortEarly: false,
+        });
+
+        handleUpdateFood(data);
+
+        setIsOpen();
+      } catch (error) {
+        console.log(error);
+      }
     },
     [handleUpdateFood, setIsOpen],
   );

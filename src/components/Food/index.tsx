@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-
+import React, { useCallback, useState } from 'react';
 import { FiEdit3, FiTrash } from 'react-icons/fi';
+
+import api from '../../services/api';
 
 import { Container } from './styles';
 
@@ -15,7 +16,7 @@ interface IFoodPlate {
 
 interface IProps {
   food: IFoodPlate;
-  handleDelete: (id: number) => {};
+  handleDelete: (id: number) => void;
   handleEditFood: (food: IFoodPlate) => void;
 }
 
@@ -26,16 +27,28 @@ const Food: React.FC<IProps> = ({
 }: IProps) => {
   const [isAvailable, setIsAvailable] = useState(food.available);
 
-  async function toggleAvailable(): Promise<void> {
-    // TODO UPDATE STATUS (available)
-  }
+  const toggleAvailable = useCallback(async () => {
+    try {
+      await api.patch(`/foods/${food.id}`, {
+        ...food,
+        available: !isAvailable,
+      });
 
-  function setEditingFood(): void {
-    // TODO - SET THE ID OF THE CURRENT ITEM TO THE EDITING FOOD AND OPEN MODAL
-  }
+      setIsAvailable(!isAvailable);
+    } catch (error) {
+      console.log(error);
+    }
+  }, [isAvailable, food]);
+
+  const setEditingFood = useCallback(() => {
+    handleEditFood({
+      ...food,
+      available: isAvailable,
+    });
+  }, [food, handleEditFood, isAvailable]);
 
   return (
-    <Container available={isAvailable}>
+    <Container $available={isAvailable}>
       <header>
         <img src={food.image} alt={food.name} />
       </header>
@@ -51,7 +64,9 @@ const Food: React.FC<IProps> = ({
           <button
             type="button"
             className="icon"
-            onClick={() => setEditingFood()}
+            onClick={() => {
+              setEditingFood();
+            }}
             data-testid={`edit-food-${food.id}`}
           >
             <FiEdit3 size={20} />
@@ -60,7 +75,9 @@ const Food: React.FC<IProps> = ({
           <button
             type="button"
             className="icon"
-            onClick={() => handleDelete(food.id)}
+            onClick={() => {
+              handleDelete(food.id);
+            }}
             data-testid={`remove-food-${food.id}`}
           >
             <FiTrash size={20} />
